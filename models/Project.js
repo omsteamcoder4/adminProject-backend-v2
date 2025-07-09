@@ -12,6 +12,15 @@ const fileSchema = new mongoose.Schema({
   notes: String,
 })
 
+const sessionSchema = new mongoose.Schema({
+  sessionId: { type: String, required: true }, // Remove unique constraint from here
+  notes: { type: String, default: "" },
+  uploadedAt: { type: Date, default: Date.now },
+  uploadedBy: String, // IP or identifier
+  files: [fileSchema],
+  isActive: { type: Boolean, default: true },
+})
+
 const projectSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
@@ -34,12 +43,16 @@ const projectSchema = new mongoose.Schema(
     },
     shareLink: String,
     shareLinkExpiry: Date,
-    files: [fileSchema],
+    sessions: [sessionSchema],
+    files: [fileSchema], // Keep for backward compatibility
     isActive: { type: Boolean, default: true },
   },
   {
     timestamps: true,
   },
 )
+
+// Create compound index instead of unique on sessionId alone
+projectSchema.index({ "sessions.sessionId": 1, _id: 1 })
 
 module.exports = mongoose.model("Project", projectSchema)

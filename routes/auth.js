@@ -1,3 +1,5 @@
+
+
 const express = require("express")
 const jwt = require("jsonwebtoken")
 const User = require("../models/User")
@@ -36,10 +38,10 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body
-console.log(username,password);
+    console.log(username, password)
 
     const user = await User.findOne({ username, isActive: true })
-    
+
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" })
     }
