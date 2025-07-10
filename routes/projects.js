@@ -1179,7 +1179,7 @@ router.post("/:id/share", auth, async (req, res) => {
     project.shareLinkExpiry = expiryDate
     await project.save()
 
-    const shareUrl = `${process.env.FRONTEND_URL || "http://localhost:3000"}/share/${shareToken}`
+    const shareUrl = `${process.env.FRONTEND_URLS?.split(",")[0]}/share/${shareToken}`
     res.json({ shareUrl, expiryDate })
   } catch (error) {
     res.status(500).json({ message: error.message })
