@@ -24,7 +24,6 @@ const sessionSchema = new mongoose.Schema({
 const projectSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
-    details: { type: String, required: true },
     phoneNumber: { type: String, required: true },
     type: {
       type: String,
