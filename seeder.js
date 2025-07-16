@@ -62,7 +62,7 @@ const seedAdmin = async () => {
 
     const admin = new User({
       username: "admin",
-      password: hashedPassword,
+      password: "admin123",
       role: "admin",
     })
 

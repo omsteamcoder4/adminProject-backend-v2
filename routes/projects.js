@@ -61,9 +61,9 @@ router.get("/", auth, async (req, res) => {
     const query = { isActive: true }
 
     // If not admin, only show user's own projects
-    if (req.user.role !== "admin") {
-      query.createdBy = req.user.id
-    }
+    // if (req.user.role !== "admin") {
+    //   query.createdBy = req.user.id
+    // }
 
     const projects = await Project.find(query).populate("createdBy", "username").sort({ createdAt: -1 })
     res.json(projects)
@@ -80,16 +80,13 @@ router.get("/:id", auth, async (req, res) => {
       return res.status(404).json({ message: "Project not found" })
     }
 
-    // Check if user can access this project
-    if (req.user.role !== "admin" && project.createdBy._id.toString() !== req.user.id) {
-      return res.status(403).json({ message: "Not authorized to access this project" })
-    }
-
+    // 👇 Authorization removed to allow users to view others' projects
     res.json(project)
   } catch (error) {
     res.status(500).json({ message: error.message })
   }
 })
+
 
 // Create project (fixed to not create empty sessions)
 router.post("/", auth, async (req, res) => {
@@ -470,6 +467,25 @@ router.put("/:id/sessions/:sessionId", auth, async (req, res) => {
     res.status(500).json({ message: error.message })
   }
 })
+
+
+// Route: PUT /projects/:projectId/sessions/:sessionId
+router.put("/projects/:projectId/sessions/:sessionId", auth, async (req, res) => {
+  try {
+    const project = await Project.findById(req.params.projectId);
+    const session = project.sessions.id(req.params.sessionId);
+    if (!session) return res.status(404).json({ message: "Session not found" });
+
+    if (req.body.notes !== undefined) {
+      session.notes = req.body.notes;
+    }
+
+    await project.save();
+    res.json({ message: "Session updated", session });
+  } catch (err) {
+    res.status(500).json({ message: "Error updating session", error: err.message });
+  }
+});
 
 // Update session notes via share link
 router.put("/share/:token/sessions/:sessionId", async (req, res) => {
